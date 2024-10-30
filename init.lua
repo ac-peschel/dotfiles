@@ -64,7 +64,7 @@ local plugins = {
         config = function()
             local config = require("nvim-treesitter.configs")
             config.setup({
-                ensure_installed = {"lua", "javascript", "typescript", "css", "html"},
+                ensure_installed = {"javascript", "typescript", "css", "html", "c_sharp"},
                 highlight = { enable=true },
                 indent = { enable=true },
             })
@@ -80,7 +80,7 @@ local plugins = {
             "MunifTanjim/nui.nvim",
         },
         config = function()
-            vim.keymap.set("n", "<C-b>", ":Neotree float toggle<CR>", {})
+            vim.keymap.set("n", "<C-b>", ":Neotree float toggle<CR>")
         end
     },
 
@@ -107,7 +107,7 @@ local plugins = {
         "williamboman/mason-lspconfig.nvim",
         config = function()
             require("mason-lspconfig").setup({
-                ensure_installed = { "lua_ls", "html", "css_variables", "eslint" }
+                ensure_installed = { "html", "css_variables", "eslint", "csharp_ls" }
             })
         end
     },
@@ -115,13 +115,27 @@ local plugins = {
         "neovim/nvim-lspconfig",
         config = function()
             local lspconfig = require("lspconfig")
-            lspconfig.lua_ls.setup({})
             lspconfig.html.setup({})
             lspconfig.css_variables.setup({})
             lspconfig.eslint.setup({})
+            lspconfig.csharp_ls.setup({})
             vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
             vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
             vim.keymap.set({"n", "v"}, "<leader>ca", vim.lsp.buf.code_action, {})
+        end
+    },
+    {
+        "akinsho/toggleterm.nvim",
+        config = function()
+            require("toggleterm").setup({
+                open_mapping=true,
+                insert_mappings=true,
+                terminal_mappings=true,
+                close_on_exit=true,
+                shell="powershell"
+            })
+            vim.keymap.set("n", "<C-t>", ":ToggleTerm powershell<CR>", {})
+            vim.keymap.set("t", "<C-t>", "exit<CR>", {})
         end
     }
 }
