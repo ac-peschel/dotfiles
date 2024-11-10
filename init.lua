@@ -1,146 +1,181 @@
---Basic Settings
+-- Basic Settings
 vim.cmd("set expandtab")
-vim.cmd("set tabstop=4")
-vim.cmd("set softtabstop=4")
-vim.cmd("set shiftwidth=4")
+vim.cmd("set tabstop=3")
+vim.cmd("set softtabstop=3")
+vim.cmd("set shiftwidth=3")
 vim.cmd("set relativenumber")
 vim.g.mapleader = " "
 
--- Assert LazyNVim (Install if missing)
+-- Ensure LazyNVim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
-    vim.fn.system({
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "https://github.com/folke/lazy.nvim.git",
-        "--branch=stable",
-        lazypath
-    })
+	vim.fn.system({
+		"git",
+		"clone",
+		"--filter=blob:none",
+		"https://github.com/folke/lazy.nvim.git",
+		"--branch=stable",
+		lazypath
+	})
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Specify Plugins
 local plugins = {
-    -- Theme
-    { 
-        "catppuccin/nvim", 
-        name="catppuccin", 
-        priority=1000,
-        config = function()
-            vim.cmd.colorscheme "catppuccin"
-        end
-    },
-
-    -- Telescope
-    { 
-        "nvim-telescope/telescope.nvim",
-        tag="0.1.8",
-        dependencies={
-            "nvim-lua/plenary.nvim"
-        },
-        config = function()
+   { 
+      "catppuccin/nvim",
+      name = "catppuccin",
+      priotiry = 1000,
+      config = function()
+         vim.cmd.colorscheme "catppuccin"
+      end
+   },
+   {
+      {
+         "nvim-telescope/telescope.nvim",
+         tag = "0.1.8",
+         dependencies = {
+            "nvim-lua/plenary.nvim",
+         },
+         config = function()
             local builtin = require("telescope.builtin")
-            vim.keymap.set("n", "<C-p>", builtin.find_files, {})
+            vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
             vim.keymap.set("n", "<leader>fg", builtin.live_grep, {})
-        end
-    },
-    {
-        "nvim-telescope/telescope-ui-select.nvim",
-        config = function()
+         end
+      },
+      {
+         "nvim-telescope/telescope-ui-select.nvim",
+         config = function()
             require("telescope").setup({
-                extensions = {
-                    ["ui-select"] = { require("telescope.themes").get_dropdown {} }
-                }
+               extensions = {
+                  ["ui-select"] = { require("telescope.themes").get_dropdown {} }
+               }
             })
             require("telescope").load_extension("ui-select")
-        end
-    },
+         end
+      }
+   },
+   {
+      "nvim-neo-tree/neo-tree.nvim",
+      branch = "v3.x",
+      dependencies = {
+         "DaikyXendo/nvim-material-icon",
+         "MunifTanjim/nui.nvim",
+      },
+      config = function()
+         vim.keymap.set("n", "<C-b>", "<Cmd>Neotree float toggle<CR>")
+      end,
+      opts = {
+         filesystem = {
+            filtered_items = {
+               show_hidden_count = false,
+               hide_gitignored = true,
+               hide_by_name = {
+                  ".git",
+               }
+            }
+         }
+      }
+   },
+   {
+      "nvim-lualine/lualine.nvim",
+      config = function()
+         require("lualine").setup({
+            options = { theme = "dracula" }
+         })
+      end
+   },
+   {
+      "VonHeikemen/lsp-zero.nvim",
+      branch = "v2.x",
+      dependencies = {
+         { "neovim/nvim-lspconfig" },
+         {
+            "williamboman/mason.nvim",
+            build = function()
+               pcall(vim.cmd, "MasonUpdate")
+            end,
+         },
+         { "williamboman/mason-lspconfig.nvim" },
+         { "hrsh7th/nvim-cmp" },
+         { "hrsh7th/cmp-nvim-lsp" },
+         { "L3MON4D3/LuaSnip" },
+         { "rafamadriz/friendly-snippets" },
+         { "hrsh7th/cmp-buffer" },
+         { "hrsh7th/cmp-path" },
+         { "hrsh7th/cmp-cmdline" },
+         { "saadparwaiz1/cmp_luasnip" },
+      },
+      config = function()
+         local lsp = require("lsp-zero")
+         lsp.on_attach(function(client, bufnr)
+            local opts = { buffer = bufnr, remap = false }
+            vim.keymap.set("n", "gr", function() vim.lsp.buf.references() end, vim.tbl_deep_extend("force", opts, {desc="LSP Goto Reference"}))
+            vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, vim.tbl_deep_extend("force", opts, { desc = "LSP Goto Definition" }))
+            vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, vim.tbl_deep_extend("force", opts, { desc = "LSP Hover" }))
+            vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, vim.tbl_deep_extend("force", opts, { desc = "LSP Code Action" }))
+            vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, vim.tbl_deep_extend("force", opts, { desc = "LSP Rename" }))
+            vim.keymap.set("n", "<C-h>", function() vim.lsp.buf.signature_help() end, vim.tbl_deep_extend("force", opts, { desc = "LSP Signature Help" }))
+            vim.keymap.set("n", "gf", function() vim.lsp.buf.format() end, vim.tbl_deep_extend("force", opts, { desc = "LSP Format" }))
+         end)
 
-    -- Treesitter
-    { 
-        "nvim-treesitter/nvim-treesitter", 
-        build=":TSUpdate",
-        config = function()
-            local config = require("nvim-treesitter.configs")
-            config.setup({
-                ensure_installed = {"javascript", "typescript", "css", "html", "c_sharp"},
-                highlight = { enable=true },
-                indent = { enable=true },
-            })
-        end
-    },
+         require("mason").setup({})
+         require("mason-lspconfig").setup({
+            ensure_installed = {
+               "eslint",
+               "jsonls",
+               "html",
+               "tailwindcss",
+               "gopls",
+            },
+            handlers = { lsp.default_setup }
+         })
 
-    -- Neotree
-    { 
-        "nvim-neo-tree/neo-tree.nvim", 
-        branch="v3.x", 
-        dependencies = {
-            "nvim-tree/nvim-web-devicons",
-            "MunifTanjim/nui.nvim",
-        },
-        config = function()
-            vim.keymap.set("n", "<C-b>", ":Neotree float toggle<CR>")
-        end
-    },
+         local cmp_action = require("lsp-zero").cmp_action()
+         local cmp = require("cmp")
+         local cmp_select = { behavior = cmp.SelectBehavior.Select }
 
-    -- Lualine
-    {
-        "nvim-lualine/lualine.nvim",
-        config = function()
-            require("lualine").setup({
-                options = {
-                    theme = "dracula"
-                }
-            })
-        end
-    },
+         require("luasnip.loaders.from_vscode").lazy_load()
 
-    -- LSPConfig
-    {
-        "williamboman/mason.nvim",
-        config = function()
-            require("mason").setup()
-        end
-    },
-    {
-        "williamboman/mason-lspconfig.nvim",
-        config = function()
-            require("mason-lspconfig").setup({
-                ensure_installed = { "html", "css_variables", "eslint", "csharp_ls" }
+         cmp.setup.cmdline("/", {
+            mapping = cmp.mapping.preset.cmdline(),
+            sources = { { name = "buffer" } }
+         })
+
+         cmp.setup.cmdline(":", {
+            mapping = cmp.mapping.preset.cmdline(),
+            sources = cmp.config.sources({
+               { name = "path" }
+            }, {
+               {
+                  name = "cmdline",
+                  option = { ignore_cmds = { "Man", "!" } }
+               }
             })
-        end
-    },
-    {
-        "neovim/nvim-lspconfig",
-        config = function()
-            local lspconfig = require("lspconfig")
-            lspconfig.html.setup({})
-            lspconfig.css_variables.setup({})
-            lspconfig.eslint.setup({})
-            lspconfig.csharp_ls.setup({})
-            vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
-            vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
-            vim.keymap.set({"n", "v"}, "<leader>ca", vim.lsp.buf.code_action, {})
-        end
-    },
-    {
-        "akinsho/toggleterm.nvim",
-        config = function()
-            require("toggleterm").setup({
-                open_mapping=true,
-                insert_mappings=true,
-                terminal_mappings=true,
-                close_on_exit=true,
-                shell="powershell"
+         })
+
+         cmp.setup({
+            snippet = {
+               expand = function(args)
+                  require("luasnip").lsp_expand(args.body)
+               end
+            },
+            sources = {
+               { name = "nvim_lsp" },
+               { name = "luasnip", keyword_length = 2 },
+               { name = "buffer", keyword_length = 3 },
+               { name = "path" }
+            },
+            mapping = cmp.mapping.preset.insert({
+               ["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
+               ["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
+               ["<CR>"] = cmp.mapping.confirm({ select = true }),
+               ["<C-Space>"] = cmp.mapping.complete(),
+               ["<Tab>"] = cmp_action.luasnip_supertab(),
+               ["<S-Tab>"] = cmp_action.luasnip_shift_supertab(),
             })
-            vim.keymap.set("n", "<C-t>", ":ToggleTerm powershell<CR>", {})
-            vim.keymap.set("t", "<C-t>", "exit<CR>", {})
-        end
-    }
+         })
+      end
+   }
 }
 
--- Specify Options
-local opts = {}
-
-require("lazy").setup(plugins, opts)
+require("lazy").setup(plugins, {})
