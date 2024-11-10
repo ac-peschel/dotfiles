@@ -175,6 +175,13 @@ local plugins = {
             })
          })
       end
+   },
+   { "preservim/nerdcommenter" },
+   { 
+      "m4xshen/autoclose.nvim",
+      config = function()
+         require("autoclose").setup()
+      end
    }
 }
 
