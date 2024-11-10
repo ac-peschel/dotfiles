@@ -2,7 +2,7 @@
 JetBrains Mono Nerd Font
 
 # Requirements (Windows)
-```$ scoop install ripgrep```\
+```scoop install ripgrep```\
 ```scoop install gcc```\
 ```scoop install main/lua```\
 ```scoop install main/luarocks```\
