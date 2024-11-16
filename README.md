@@ -9,5 +9,5 @@ JetBrains Mono Nerd Font
 ```scoop install main/pwsh```\
 
 # WezTerm Config Location (Windows):
-Config inspired (copied and then modified) from: https://www.youtube.com/watch?v=V1X4WQTaxrc\
-```%userprofile%\.wezterm.lua```\
+Config inspired (copied and then modified) from: https://www.youtube.com/watch?v=V1X4WQTaxrc
+```%userprofile%\.wezterm.lua```
