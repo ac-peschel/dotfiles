@@ -3,7 +3,7 @@ vim.cmd("set expandtab")
 vim.cmd("set tabstop=3")
 vim.cmd("set softtabstop=3")
 vim.cmd("set shiftwidth=3")
-vim.cmd("set relativenumber")
+vim.cmd("set number relativenumber")
 vim.g.mapleader = " "
 
 -- Ensure LazyNVim
@@ -45,10 +45,43 @@ local plugins = {
       {
          "nvim-telescope/telescope-ui-select.nvim",
          config = function()
+             local telescope = require 'telescope'
+             local actions = require 'telescope.actions'
+             local is_windows = vim.fn.has('win64') == 1 or vim.fn.has('win32') == 1
+             local vimfnameescape = vim.fn.fnameescape
+             local winfnameescape = function(path)
+               local escaped_path = vimfnameescape(path)
+               if is_windows then
+                 local need_extra_esc = path:find('[%[%]`%$~]')
+                 local esc = need_extra_esc and '\\\\' or '\\'
+                 escaped_path = escaped_path:gsub('\\[%(%)%^&;]', esc .. '%1')
+                 if need_extra_esc then
+                   escaped_path = escaped_path:gsub("\\\\['` ]", '\\%1')
+                 end
+               end
+               return escaped_path
+             end
+
+             local select_default = function(prompt_bufnr)
+               vim.fn.fnameescape = winfnameescape
+               local result = actions.select_default(prompt_bufnr, "default")
+               vim.fn.fnameescape = vimfnameescape
+               return result
+             end
             require("telescope").setup({
                extensions = {
                   ["ui-select"] = { require("telescope.themes").get_dropdown {} }
-               }
+               },
+               defaults = {
+                  mappings = {
+                     i = {
+                        ["<CR>"] = select_default,
+                     },
+                     n = {
+                        ["<CR>"] = select_default,
+                     },
+                  },
+               },
             })
             require("telescope").load_extension("ui-select")
          end
@@ -121,12 +154,20 @@ local plugins = {
          require("mason").setup({})
          require("mason-lspconfig").setup({
             ensure_installed = {
-               "eslint",
-               "jsonls",
-               "html",
-               "tailwindcss",
                "gopls",
+               "ts_ls",
+               "tailwindcss"
             },
+            config = function()
+               local util = require("lspconfig.util")
+               require("ts_ls").setup({
+                 init_options = { hostInfo = "neovim" } ,
+                 cmd = { "typescript-language-server", "--stdio" },
+                 filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
+                 root_dir = util.root_pattern("tsconfig.json", "jsconfig.json", "package.json", ".git"),
+                 single_file_support = true,
+               })
+            end,
             handlers = { lsp.default_setup }
          })
 
@@ -170,7 +211,6 @@ local plugins = {
                ["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
                ["<CR>"] = cmp.mapping.confirm({ select = true }),
                ["<C-Space>"] = cmp.mapping.complete(),
-               ["<Tab>"] = cmp_action.luasnip_supertab(),
                ["<S-Tab>"] = cmp_action.luasnip_shift_supertab(),
             })
          })
