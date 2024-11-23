@@ -4,12 +4,12 @@
 JetBrains Mono Nerd Font
 
 ## Requirements
-```scoop install ripgrep```\
-```scoop install gcc```\
-```scoop install main/lua```\
-```scoop install main/luarocks```\
-```scoop install main/pwsh```\
-```winget upgrade JanDeDobbeleer.OhMyPosh -s winget```
+- ```scoop install ripgrep```
+- ```scoop install gcc```
+- ```scoop install main/lua```
+- ```scoop install main/luarocks```
+- ```scoop install main/pwsh```
+- ```winget upgrade JanDeDobbeleer.OhMyPosh -s winget```
 
 ## Installing LSPs
 - GO (golang and mason-lspconfig are enough)
@@ -19,7 +19,7 @@ JetBrains Mono Nerd Font
 
 ## WezTerm Config Location
 Config inspired (copied and then modified) from: https://www.youtube.com/watch?v=V1X4WQTaxrc
-```%userprofile%\.wezterm.lua```
+- ```%userprofile%\.wezterm.lua```
 
 ## Neovim Config Location
-```%localappdata%\nvim\init.lua```
+- ```%localappdata%\nvim\init.lua```
