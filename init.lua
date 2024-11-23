@@ -6,6 +6,9 @@ vim.cmd("set shiftwidth=3")
 vim.cmd("set number relativenumber")
 vim.g.mapleader = " "
 
+vim.keymap.set("v", "<leader>y", '"+y', {})
+vim.keymap.set("n", "<leader>p", '"+p', {})
+
 -- Ensure LazyNVim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -156,7 +159,10 @@ local plugins = {
             ensure_installed = {
                "gopls",
                "ts_ls",
-               "tailwindcss"
+               "tailwindcss",
+               "html",
+               "cssls",
+               "jsonls",
             },
             config = function()
                local util = require("lspconfig.util")
@@ -211,16 +217,25 @@ local plugins = {
                ["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
                ["<CR>"] = cmp.mapping.confirm({ select = true }),
                ["<C-Space>"] = cmp.mapping.complete(),
-               ["<S-Tab>"] = cmp_action.luasnip_shift_supertab(),
             })
          })
       end
    },
    { "preservim/nerdcommenter" },
-   { 
-      "m4xshen/autoclose.nvim",
+   {
+      "supermaven-inc/supermaven-nvim",
       config = function()
-         require("autoclose").setup()
+         require("supermaven-nvim").setup({
+            keymaps = {
+               accept_suggestion = "<Tab>",
+               clear_suggestion = "<S-Tab>",
+               accept_word = "<C-Right>",
+            },
+            color = {
+               suggestion_color = "#313244",
+               cterm = 244,
+            }
+         })
       end
    }
 }
