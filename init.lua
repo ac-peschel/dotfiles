@@ -163,6 +163,8 @@ local plugins = {
                "html",
                "cssls",
                "jsonls",
+               "csharp_ls",
+               "lemminx",
             },
             config = function()
                local util = require("lspconfig.util")

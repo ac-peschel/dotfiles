@@ -16,6 +16,7 @@ JetBrains Mono Nerd Font
 - Typescript ```npm install -g typescript typescript-language-server```
 - TailwindCSS ```npm install -g @tailwindcss/language-server```
 - JSON/HTML/CSS ```npm install -g vscode-langservers-extracted```
+- C# ```dotnet tool install --global csharp-ls```
 
 ## WezTerm Config Location
 Config inspired (copied and then modified) from: https://www.youtube.com/watch?v=V1X4WQTaxrc
