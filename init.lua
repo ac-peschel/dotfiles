@@ -157,27 +157,11 @@ local plugins = {
          require("mason").setup({})
          require("mason-lspconfig").setup({
             ensure_installed = {
-               "gopls",
-               "ts_ls",
-               "tailwindcss",
-               "html",
-               "cssls",
-               "jsonls",
                "csharp_ls",
-               "lemminx",
             },
-            config = function()
-               local util = require("lspconfig.util")
-               require("ts_ls").setup({
-                 init_options = { hostInfo = "neovim" } ,
-                 cmd = { "typescript-language-server", "--stdio" },
-                 filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
-                 root_dir = util.root_pattern("tsconfig.json", "jsconfig.json", "package.json", ".git"),
-                 single_file_support = true,
-               })
-            end,
-            handlers = { lsp.default_setup }
          })
+
+         require("lspconfig").csharp_ls.setup({})
 
          local cmp_action = require("lsp-zero").cmp_action()
          local cmp = require("cmp")
@@ -223,23 +207,19 @@ local plugins = {
          })
       end
    },
-   { "preservim/nerdcommenter" },
    {
-      "supermaven-inc/supermaven-nvim",
+      "nvim-treesitter/nvim-treesitter",
+      build = ":TSUpdate",
       config = function()
-         require("supermaven-nvim").setup({
-            keymaps = {
-               accept_suggestion = "<Tab>",
-               clear_suggestion = "<S-Tab>",
-               accept_word = "<C-Right>",
-            },
-            color = {
-               suggestion_color = "#313244",
-               cterm = 244,
-            }
+         require("nvim-treesitter.configs").setup({
+            ensure_installed = { "gdscript", "godot_resource", "gdshader", "lua", "vim", "vimdoc" },
+            auto_install = true,
+            highlight = { enable = true },
+            indent = { enable = true },
          })
       end
-   }
+   },
+   { "preservim/nerdcommenter" },
 }
 
 require("lazy").setup(plugins, {})

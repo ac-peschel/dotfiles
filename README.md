@@ -12,10 +12,6 @@ JetBrains Mono Nerd Font
 - ```winget upgrade JanDeDobbeleer.OhMyPosh -s winget```
 
 ## Installing LSPs
-- GO (golang and mason-lspconfig are enough)
-- Typescript ```npm install -g typescript typescript-language-server```
-- TailwindCSS ```npm install -g @tailwindcss/language-server```
-- JSON/HTML/CSS ```npm install -g vscode-langservers-extracted```
 - C# ```dotnet tool install --global csharp-ls```
 
 ## WezTerm Config Location
