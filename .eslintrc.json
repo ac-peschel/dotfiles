@@ -1,0 +1,49 @@
+{
+    "env": 
+        "browser": tru
+        "es2021": tru
+        "node": tr
+    }
+    "extends": 
+        "eslint:recommended
+        "plugin:react/recommended
+        "plugin:@typescript-eslint/recommended
+        "next/core-web-vitals
+        "prettie
+    ]
+    "parser": "@typescript-eslint/parser"
+    "parserOptions": 
+        "ecmaFeatures":
+            "jsx": t
+        
+        "ecmaVersion": 1
+        "sourceType": "modul
+    }
+    "plugins": 
+      [
+      
+   
+       "react
+        "@typescript-eslint"
+      ,
+      rules": {
+         
+         
+            
+         
+      
+        "react/react-in-jsx-sco
+     
+       "no-unuse
+           "warn
+            {
+       
+          }
+       "react/prop-types": "off"
+   },
+   "settings": {
+      "react": {
+         "version": "detect"
+      }
+   }
+}

@@ -123,11 +123,13 @@ local plugins = {
          local lspconfig = require("lspconfig")
          local on_attach = function(client, bufnr)
             local opts = { buffer = bufnr, desc = "Code Actions" }
-            vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_actions, opts)
+            if client.supports_method("textDocument/codeAction") then
+               vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, opts)
+            end
             vim.keymap.set("n", "K", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature Help" })
             vim.keymap.set("n", "<C-k>", vim.lsp.buf.hover, { buffer = bufnr, desc = "Hover" })
             vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = bufnr, desc = "Rename" })
-            
+         
             if client.supports_method("textDocument/formatting") then
                vim.api.nvim_create_autocmd("BufWritePre", {
                   buffer = bufnr,
@@ -240,8 +242,8 @@ local plugins = {
        null_ls.setup({
          sources = sources,
          on_attach = function(client, bufnr)
-            vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action { buffer = bufnr, desc = "Code Actions" })
-            if client.supports_methods("textDocument/formatting") then
+            vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, { buffer = bufnr, desc = "Code Actions" })
+            if client.supports_method("textDocument/formatting") then
                vim.api.nvim_create_autocmd("BufWritePre", {
                   buffer = bufnr,
                   callback = function()
