@@ -29,6 +29,26 @@ local plugins = {
 		priority = 1000,
 		config = function()
 			vim.cmd("colorscheme gruvbox")
+
+         vim.api.nvim_set_hl(0, "CmpItemAbbr",        { fg = "#ebdbb2" })         
+         vim.api.nvim_set_hl(0, "CmpItemAbbrMatch",   { fg = "#fabd2f", bold = true })
+         vim.api.nvim_set_hl(0, "CmpItemKind",        { fg = "#83a598" })
+         vim.api.nvim_set_hl(0, "CmpItemMenu",        { fg = "#b8bb26", italic = true })
+         vim.api.nvim_set_hl(0, "CmpItemKindFunction",{ fg = "#b8bb26" })
+         vim.api.nvim_set_hl(0, "CmpItemKindVariable",{ fg = "#d3869b" })
+         vim.api.nvim_set_hl(0, "CmpItemKindSnippet", { fg = "#fe8019" })
+         vim.api.nvim_set_hl(0, "CmpItemAbbrMatch",        { fg = "#fabd2f", bold = true })
+         vim.api.nvim_set_hl(0, "CmpItemAbbrMatchFuzzy",   { fg = "#fabd2f", bold = true })
+         local neutral = "#ebdbb2"
+         vim.api.nvim_set_hl(0, "CmpItemKindEvent",    { fg = neutral })
+         vim.api.nvim_set_hl(0, "CmpItemKindOperator", { fg = neutral })
+         vim.api.nvim_set_hl(0, "CmpItemKindKeyword",  { fg = neutral })
+         vim.api.nvim_set_hl(0, "CmpItemKindSnippet",  { fg = neutral })
+         vim.api.nvim_set_hl(0, "CmpItemKindColor",    { fg = neutral })
+         vim.api.nvim_set_hl(0, "CmpItemAbbrDeprecated", {
+           fg = "#928374", -- gruvbox gray
+           strikethrough = true,
+         })
 		end
 	},
 
@@ -113,10 +133,10 @@ local plugins = {
             "cssls",
             "jsonls",
             "tailwindcss",
-         } 
-      })
+            "gopls",
+         }})
       end
-      },
+   },
    {
       "neovim/nvim-lspconfig",
       config = function()
@@ -134,7 +154,7 @@ local plugins = {
                vim.api.nvim_create_autocmd("BufWritePre", {
                   buffer = bufnr,
                   callback = function()
-                     vim.lsp.buf.format({ asnyc = false })
+                     vim.lsp.buf.format({ asnyc = true })
                   end
                })
             end
@@ -175,6 +195,10 @@ local plugins = {
                "php"
             }
          })
+
+         lspconfig.gopls.setup({
+            on_attach = on_attach,
+         })
       end
    },
 
@@ -209,45 +233,35 @@ local plugins = {
 
    -- Code Actions
    {
+      "jay-babu/mason-null-ls.nvim",
+      config = function()
+         require("mason-null-ls").setup({
+            ensure_installed = {
+               "gofumpt",
+               "goimports",
+            },
+            automatic_installation = true,
+         })
+      end
+   },
+   {
      "nvimtools/none-ls.nvim",
      config = function()
        local null_ls = require("null-ls")
        local u = require("null-ls.utils").make_conditional_utils()
 
-       local sources = {}
-
-       if u.root_has_file({
-         ".eslintrc.js",
-         ".eslintrc.cjs",
-         ".eslintrc.json",
-         ".eslintrc.yaml",
-         ".eslintrc.yml",
-         ".eslintrc",
-         "package.json", -- eslint z. B. in dependencies
-       }) then
-         table.insert(sources, null_ls.builtins.diagnostics.eslint)
-         table.insert(sources, null_ls.builtins.code_actions.eslint)
-       end
-
-       if u.root_has_file({
-         ".prettierrc",
-         ".prettierrc.js",
-         ".prettierrc.json",
-         "prettier.config.js",
-         "package.json",
-       }) then
-         table.insert(sources, null_ls.builtins.formatting.prettier)
-       end
-
        null_ls.setup({
-         sources = sources,
+         sources = {
+            null_ls.builtins.formatting.gofumpt,
+            null_ls.builtins.formatting.goimports,
+         },
          on_attach = function(client, bufnr)
             vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, { buffer = bufnr, desc = "Code Actions" })
             if client.supports_method("textDocument/formatting") then
                vim.api.nvim_create_autocmd("BufWritePre", {
                   buffer = bufnr,
                   callback = function()
-                     vim.lsp.buf.format({ async = true })
+                     vim.lsp.buf.format({ async = false })
                   end
                })
             end
@@ -298,42 +312,6 @@ local plugins = {
      end,
    },
 
-   -- Toggle Term
-   {
-      "akinsho/toggleterm.nvim",
-      version = "*",
-      config = function()
-         require("toggleterm").setup({
-            direction = "float",
-            open_mapping = [[<C-\>]],
-            shade_terminals = true,
-            persist_size = true,
-            start_in_insert = true,
-            float_opts = {
-               border = "curved",
-               winblend = 3,
-            },
-         })
-
-         local Terminal = require("toggleterm.terminal").Terminal
-         local term1 = Terminal:new({ count = 1})
-         local term2 = Terminal:new({ count = 2})
-
-         local function toggle_and_insert(term)
-            term:toggle()
-            vim.defer_fn(function()
-               if term:is_open() then
-                  vim.cmd("startinsert")
-               end
-            end, 20)
-         end
-
-         vim.keymap.set("n", "<leader>1", function() toggle_and_insert(term1) end, { desc = "Toggle Term1" })
-         vim.keymap.set("n", "<leader>2", function() toggle_and_insert(term2) end, { desc = "Toggle Term2" })
-         vim.keymap.set("t", "<Esc>", "<C-\\><C-n><cmd>ToggleTerm<CR>", { desc = "ToggleTerm" })
-      end
-   },
-
    -- Treesitter
    {
       "nvim-treesitter/nvim-treesitter",
@@ -341,7 +319,7 @@ local plugins = {
       event = "BufReadPost",
       config = function()
          require("nvim-treesitter.configs").setup({
-            ensure_installed = { "lua", "javascript", "typescript", "css", "html", "json"},
+            ensure_installed = { "lua", "javascript", "typescript", "css", "html", "json", "go", "gomod", "gosum", "gowork"},
             highlight = { enable = true },
             autopairs = { enable = true },
             ident = { enable = true }
