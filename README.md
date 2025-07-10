@@ -1,4 +1,4 @@
-# My Neovim Setup for typescript on Windows
+# My Neovim Setup for React/TS/GO on Windows
 
 ## Font
 Fira Code Mono Nerd Font
