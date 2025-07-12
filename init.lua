@@ -133,7 +133,7 @@ local plugins = {
             "cssls",
             "jsonls",
             "tailwindcss",
-            "gopls",
+            "pyright",
          }})
       end
    },
@@ -196,8 +196,19 @@ local plugins = {
             }
          })
 
-         lspconfig.gopls.setup({
+         lspconfig.pyright.setup({
             on_attach = on_attach,
+            filetypes = { "pytho" },
+            root_dir = lspconfig.util.root_pattern(".git", "pyproject.toml"),
+            settings = {
+               python = {
+                  analysis = {
+                     typeCheckingMode = "strict",
+                     autoSearchPaths = true,
+                     useLibraryCodeForTypes = true,
+                  }
+               }
+            }
          })
       end
    },
@@ -233,28 +244,13 @@ local plugins = {
 
    -- Code Actions
    {
-      "jay-babu/mason-null-ls.nvim",
-      config = function()
-         require("mason-null-ls").setup({
-            ensure_installed = {
-               "gofumpt",
-               "goimports",
-            },
-            automatic_installation = true,
-         })
-      end
-   },
-   {
      "nvimtools/none-ls.nvim",
      config = function()
        local null_ls = require("null-ls")
        local u = require("null-ls.utils").make_conditional_utils()
 
        null_ls.setup({
-         sources = {
-            null_ls.builtins.formatting.gofumpt,
-            null_ls.builtins.formatting.goimports,
-         },
+         sources = {},
          on_attach = function(client, bufnr)
             vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, { buffer = bufnr, desc = "Code Actions" })
             if client.supports_method("textDocument/formatting") then
@@ -319,7 +315,7 @@ local plugins = {
       event = "BufReadPost",
       config = function()
          require("nvim-treesitter.configs").setup({
-            ensure_installed = { "lua", "javascript", "typescript", "css", "html", "json", "go", "gomod", "gosum", "gowork"},
+            ensure_installed = { "lua", "javascript", "typescript", "css", "html", "json" },
             highlight = { enable = true },
             autopairs = { enable = true },
             ident = { enable = true }
