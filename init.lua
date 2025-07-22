@@ -78,7 +78,10 @@ local plugins = {
             ensure_installed = {
                "javascript",
                "typescript",
-               "c_sharp",
+               "tsx",
+               "html",
+               "css",
+               "json",
                "lua",
                "c",
                "cpp",
@@ -185,7 +188,11 @@ local plugins = {
          config = function()
             require("mason-lspconfig").setup({
                ensure_installed = {
-                  "csharp_ls"
+                  "ts_ls",
+                  "eslint",
+                  "jsonls",
+                  "cssls",
+                  "html"
                }
             })
          end
@@ -215,32 +222,85 @@ local plugins = {
                end
             end
 
-            lspconfig.csharp_ls.setup({
-               cmd = { "csharp-ls" },
-               root_dir = lspconfig.util.root_pattern("*.sln", "*.csproj", ".git"),
-               on_attach = on_attach
+            lspconfig.ts_ls.setup({
+               on_attach = on_attach,
+               flags = { debounce_text_changes = 150},
+            })
+
+            lspconfig.eslint.setup({
+               on_attach = function(client, bufnr)
+                  on_attach(client, bufnr)
+                  client.server_capabilities.documentFormattingProvider = true
+               end
+            })
+
+            lspconfig.html.setup({ on_attach = on_attach })
+            lspconfig.cssls.setup({ on_attach = on_attach })
+            lspconfig.jsonls.setup({ on_attach = on_attach })
+         end
+      }
+   },
+
+   -- Snippets
+   {
+      {
+         "L3MON4D3/LuaSnip",
+         dependencies = {
+            "rafamadriz/friendly-snippets"
+         },
+         config = function()
+            require("luasnip.loaders.from_vscode").lazy_load()
+         end
+      },
+      {
+         "hrsh7th/nvim-cmp",
+         dependencies = {
+            "hrsh7th/cmp-nvim-lsp",
+            "saadparwaiz1/cmp_luasnip",
+            "hrsh7th/cmp-buffer",
+            "hrsh7th/cmp-path",
+         },
+         config = function()
+            local cmp = require("cmp")
+            local luasnip = require("luasnip")
+
+            cmp.setup({
+               snippet = {
+                  expand = function(args)
+                     luasnip.lsp_expand(args.body)
+                  end
+               },
+               mapping = cmp.mapping.preset.insert({
+                  ["<C-Space>"] = cmp.mapping.complete(),
+                  ["<CR>"] = cmp.mapping.confirm({select = true}),
+                  ["<Tab>"] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                           cmp.select_next_item()
+                        elseif luasnip.expand_or_jumpable() then
+                           luasnip.expand_or_jump()
+                        else
+                           fallback()
+                        end
+                  end, {"i", "s"}),
+                  ["<S-Tab>"] = cmp.mapping(function(fallback) 
+                     if cmp.visible() then
+                        cmp.select_prev_item()
+                     elseif luasnip.jumpable(-1) then
+                        luasnip.jump(-1)
+                     else
+                        fallback()
+                     end
+                  end, {"i", "s"})
+               }),
+               sources = {
+                  {name="nvim_lsp"},
+                  {name="luasnip"},
+                  {name="buffer"},
+                  {name="path"}
+               }
             })
          end
       }
    }
 }
 require("lazy").setup(plugins, {})
-
-vim.api.nvim_create_autocmd("LspAttach", {
-  callback = function(args)
-    local bufnr = args.buf
-    local client_id = args.data and args.data.client_id
-    if not bufnr or not client_id then return end
-
-    local client = vim.lsp.get_client_by_id(client_id)
-    if client and client.name == "csharp_ls" and vim.api.nvim_buf_is_valid(bufnr) then
-      vim.schedule(function()
-        -- Force a 'didChange' notification by writing the same line
-        local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
-        if first_line then
-          vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { first_line })
-        end
-      end)
-    end
-  end,
-})
