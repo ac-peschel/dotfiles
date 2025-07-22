@@ -6,51 +6,94 @@ vim.cmd("set number relativenumber")
 vim.g.mapleader = " "
 vim.keymap.set("v", "<leader>y", '"+y', {})
 vim.keymap.set("n", "<leader>p", '"+p', {})
+vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, {})
+vim.o.wrap = false
 
--- Ensure LazyNVim
+-- Lazy
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
-	vim.fn.system({
-		"git",
-		"clone",
-		"--filter=blob:none",
-		"https://github.com/folke/lazy.nvim.git",
-		"--branch=stable",
-		lazypath
-	})
+   vim.fn.system({
+      "git",
+      "clone",
+      "--filter=blob:none",
+      "https://github.com/folke/lazy.nvim.git",
+      "--branch=stable",
+      lazypath
+   })
 end
 vim.opt.rtp:prepend(lazypath)
 
 local plugins = {
-   -- Theme
-	{
-		"morhetz/gruvbox",
-		lazy = false,
-		priority = 1000,
-		config = function()
-			vim.cmd("colorscheme gruvbox")
-
-         vim.api.nvim_set_hl(0, "CmpItemAbbr",        { fg = "#ebdbb2" })         
-         vim.api.nvim_set_hl(0, "CmpItemAbbrMatch",   { fg = "#fabd2f", bold = true })
-         vim.api.nvim_set_hl(0, "CmpItemKind",        { fg = "#83a598" })
-         vim.api.nvim_set_hl(0, "CmpItemMenu",        { fg = "#b8bb26", italic = true })
-         vim.api.nvim_set_hl(0, "CmpItemKindFunction",{ fg = "#b8bb26" })
-         vim.api.nvim_set_hl(0, "CmpItemKindVariable",{ fg = "#d3869b" })
-         vim.api.nvim_set_hl(0, "CmpItemKindSnippet", { fg = "#fe8019" })
-         vim.api.nvim_set_hl(0, "CmpItemAbbrMatch",        { fg = "#fabd2f", bold = true })
-         vim.api.nvim_set_hl(0, "CmpItemAbbrMatchFuzzy",   { fg = "#fabd2f", bold = true })
-         local neutral = "#ebdbb2"
-         vim.api.nvim_set_hl(0, "CmpItemKindEvent",    { fg = neutral })
-         vim.api.nvim_set_hl(0, "CmpItemKindOperator", { fg = neutral })
-         vim.api.nvim_set_hl(0, "CmpItemKindKeyword",  { fg = neutral })
-         vim.api.nvim_set_hl(0, "CmpItemKindSnippet",  { fg = neutral })
-         vim.api.nvim_set_hl(0, "CmpItemKindColor",    { fg = neutral })
-         vim.api.nvim_set_hl(0, "CmpItemAbbrDeprecated", {
-           fg = "#928374", -- gruvbox gray
-           strikethrough = true,
+   -- Theming
+   {
+      "ellisonleao/gruvbox.nvim",
+      lazy = false,
+      priority = 1000,
+      config = function()
+         require("gruvbox").setup({
+            contrast = "hard",
+            palette_overrides = {
+               gray = "#928374",
+               bright_yellow = "#d7a73b",
+               neutral_yellow = "#d7a73b",
+               bright_green = "#d7a73b",
+               neutral_green = "#d7a73b",
+               bright_orange = "#fe8019",
+            },
+            overrides = {
+               Normal = { bg = "#282828", fg = "#ebdbb2" },
+               Comment = { fg = "#928374", italic = true },
+               String = { fg = "#d7a73b" },
+               Keyword = { fg = "#fe8019", bold = true },
+               Function = { fg = "#83a598", bold = true },
+               Type = { fg = "#83a598" },
+               Constant = { fg = "#d3869b" },
+               Identifier = { fg = "#ebdbb2" },
+               CmpItemAbbr = { fg = "#ebdbb2" },
+               CmpItemAbbrMatch = { fg = "#d7a73b", bold = true },
+               CmpItemAbbrMatchFuzzy = { fg = "#d7a73b", bold = true },
+               CmpItemKind = { fg = "#83a598" },
+               CmpItemMenu = { fg = "#d7a73b", italic = true },
+               CmpItemKindFunction = { fg = "#83a598" },
+               CmpItemKindVariable = { fg = "#d3869b" },
+               CmpItemKindSnippet = { fg = "#fe8019" },
+               CmpItemAbbrDeprecated = { fg = "#928374", strikethrough = true },
+               CmpItemKindEvent = { fg = "#ebdbb2" },
+               CmpItemKindOperator = { fg = "#ebdbb2" },
+               CmpItemKindKeyword = { fg = "#ebdbb2" },
+               CmpItemKindColor = { fg = "#ebdbb2" },
+            }
          })
-		end
-	},
+         vim.cmd("colorscheme gruvbox")
+      end
+   },
+
+   -- Treesitter
+   {
+      "nvim-treesitter/nvim-treesitter",
+      build = ":TSUpdate",
+      event = {"BufReadPost", "BufNewFile"},
+      config = function()
+         require("nvim-treesitter.configs").setup({
+            ensure_installed = {
+               "javascript",
+               "typescript",
+               "c_sharp",
+               "lua",
+               "c",
+               "cpp",
+               "bash",
+            },
+            highlight = {
+               enable = true,
+               additional_vim_regex_highlighting = false,
+            },
+            indent = {
+               enable = true,
+            }
+         })
+      end
+   },
 
    -- Telescope
    {
@@ -69,29 +112,11 @@ local plugins = {
       {
          "nvim-telescope/telescope-ui-select.nvim",
          config = function()
-             local telescope = require 'telescope'
-             local actions = require 'telescope.actions'
-             local is_windows = vim.fn.has('win64') == 1 or vim.fn.has('win32') == 1
-             local vimfnameescape = vim.fn.fnameescape
-             local winfnameescape = function(path)
-               local escaped_path = vimfnameescape(path)
-               if is_windows then
-                 local need_extra_esc = path:find('[%[%]`%$~]')
-                 local esc = need_extra_esc and '\\\\' or '\\'
-                 escaped_path = escaped_path:gsub('\\[%(%)%^&;]', esc .. '%1')
-                 if need_extra_esc then
-                   escaped_path = escaped_path:gsub("\\\\['` ]", '\\%1')
-                 end
-               end
-               return escaped_path
-             end
+            local actions = require("telescope.actions")
+            local select_default = function(prompt_bufnr)
+               return actions.select_default(prompt_bufnr, "default")
+            end
 
-             local select_default = function(prompt_bufnr)
-               vim.fn.fnameescape = winfnameescape
-               local result = actions.select_default(prompt_bufnr, "default")
-               vim.fn.fnameescape = vimfnameescape
-               return result
-             end
             require("telescope").setup({
                extensions = {
                   ["ui-select"] = { require("telescope.themes").get_dropdown {} }
@@ -109,218 +134,12 @@ local plugins = {
             })
             require("telescope").load_extension("ui-select")
          end
-      }
-   },
-
-   -- Comment toggling
-   {
-      "preservim/nerdcommenter",
+ 	   }
    },
    
-   -- LSP
+   -- Comment toggle
    {
-      "williamboman/mason.nvim",
-      config = function()
-         require("mason").setup()
-      end
-   },
-   {
-      "williamboman/mason-lspconfig.nvim",
-      config = function()
-         require("mason-lspconfig").setup({ ensure_installed = { 
-            "ts_ls",
-            "html",
-            "cssls",
-            "jsonls",
-            "tailwindcss",
-            "pyright",
-         }})
-      end
-   },
-   {
-      "neovim/nvim-lspconfig",
-      config = function()
-         local lspconfig = require("lspconfig")
-         local on_attach = function(client, bufnr)
-            local opts = { buffer = bufnr, desc = "Code Actions" }
-            if client.supports_method("textDocument/codeAction") then
-               vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, opts)
-            end
-            vim.keymap.set("n", "K", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature Help" })
-            vim.keymap.set("n", "<C-k>", vim.lsp.buf.hover, { buffer = bufnr, desc = "Hover" })
-            vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = bufnr, desc = "Rename" })
-         
-            if client.supports_method("textDocument/formatting") then
-               vim.api.nvim_create_autocmd("BufWritePre", {
-                  buffer = bufnr,
-                  callback = function()
-                     vim.lsp.buf.format({ asnyc = true })
-                  end
-               })
-            end
-         end
-         
-         lspconfig.ts_ls.setup({
-            on_attach = on_attach,
-            cmd = { "typescript-language-server", "--stdio" },
-            filetypes = { "typescript", "typescriptreact", "typescript.tsx", "javascript", "javascriptreact" },
-            root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", ".git"),
-         })
-
-         lspconfig.html.setup({
-            on_attach = on_attach,
-            filetypes = { "html" }
-         })
-
-         lspconfig.cssls.setup({
-            on_attach = on_attach,
-            filetypes = { "css", "scss", "less" }
-         })
-
-         lspconfig.jsonls.setup({
-            on_attach = on_attach,
-            filetypes = { "json", "jsonc" }
-         })
-
-         lspconfig.tailwindcss.setup({
-            on_attach = on_attach,
-            filetypes = {
-               "html",
-               "javascript",
-               "javascriptreact",
-               "typescript",
-               "typescriptreact",
-               "vue",
-               "svelte",
-               "php"
-            }
-         })
-
-         lspconfig.pyright.setup({
-            on_attach = on_attach,
-            filetypes = { "pytho" },
-            root_dir = lspconfig.util.root_pattern(".git", "pyproject.toml"),
-            settings = {
-               python = {
-                  analysis = {
-                     typeCheckingMode = "strict",
-                     autoSearchPaths = true,
-                     useLibraryCodeForTypes = true,
-                  }
-               }
-            }
-         })
-      end
-   },
-
-   -- Cmp & LuaSnip
-   {
-      "hrsh7th/nvim-cmp",
-      dependencies = {
-         "hrsh7th/cmp-nvim-lsp",
-         "L3MON4D3/LuaSnip",
-         "saadparwaiz1/cmp_luasnip",
-      },
-      config = function()
-         local cmp = require("cmp")
-         cmp.setup({
-            snippet = {
-               expand = function(args)
-                  require("luasnip").lsp_expand(args.body)
-               end
-            },
-            mapping = cmp.mapping.preset.insert({
-               ["<Tab>"] = cmp.mapping.select_next_item(),
-               ["<S-Tab>"] = cmp.mapping.select_prev_item(),
-               ["<CR>"] = cmp.mapping.confirm({ select = true }),
-            }),
-            sources = {
-               { name = "nvim_lsp" },
-               { name = "luasnip" },
-            },
-         })
-      end
-   },
-
-   -- Code Actions
-   {
-     "nvimtools/none-ls.nvim",
-     config = function()
-       local null_ls = require("null-ls")
-       local u = require("null-ls.utils").make_conditional_utils()
-
-       null_ls.setup({
-         sources = {},
-         on_attach = function(client, bufnr)
-            vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, { buffer = bufnr, desc = "Code Actions" })
-            if client.supports_method("textDocument/formatting") then
-               vim.api.nvim_create_autocmd("BufWritePre", {
-                  buffer = bufnr,
-                  callback = function()
-                     vim.lsp.buf.format({ async = false })
-                  end
-               })
-            end
-         end
-       })
-     end,
-   },
-
-   -- Oil Explorer
-   {
-     "stevearc/oil.nvim",
-     lazy = false,
-     dependencies = { "nvim-tree/nvim-web-devicons" },
-     config = function()
-       require("oil").setup({
-         default_file_explorer = false,
-         view_options = {
-           show_hidden = true,
-         },
-         float = {
-           padding = 2,
-           max_width = 80,
-           max_height = 40,
-           border = "rounded",
-         },
-       })
-
-       vim.api.nvim_create_autocmd("User", {
-         pattern = "OilEnter",
-         callback = function()
-           vim.b._previous_bufnr = vim.fn.bufnr("#")
-         end,
-       })
-
-       vim.api.nvim_create_autocmd("BufWinLeave", {
-         pattern = "*oil*",
-         callback = function()
-           local prev = vim.b._previous_bufnr
-           if prev and vim.api.nvim_buf_is_valid(prev) then
-             vim.defer_fn(function()
-               vim.cmd("buffer " .. prev)
-             end, 0)
-           end
-         end,
-       })
-
-       vim.keymap.set("n", "<leader>e", require("oil").toggle_float, { desc = "Oil (floating)" })
-     end,
-   },
-
-   -- Treesitter
-   {
-      "nvim-treesitter/nvim-treesitter",
-      build = ":TSUpdate",
-      event = "BufReadPost",
-      config = function()
-         require("nvim-treesitter.configs").setup({
-            ensure_installed = { "lua", "javascript", "typescript", "css", "html", "json" },
-            highlight = { enable = true },
-            autopairs = { enable = true },
-            ident = { enable = true }
-         })
-      end
+      "preservim/nerdcommenter"
    },
 
    -- Autopairs
@@ -330,9 +149,98 @@ local plugins = {
       config = function()
          require("nvim-autopairs").setup({
             check_ts = true,
-            disable_filetype = { "TalescopePrompt", "vim" },
+            disable_filetype = { "TelescopePrompt", "vim" },
          })
       end
    },
+
+   -- Neotree
+   {
+      "nvim-neo-tree/neo-tree.nvim",
+      branch="v3.x",
+      dependencies = {
+         "nvim-tree/nvim-web-devicons",
+         "MunifTanjim/nui.nvim",
+      },
+      config = function()
+         vim.keymap.set("n", "<leader>e", "<Cmd>Neotree float toggle<CR>", {})
+      end
+   },
+
+   -- LSP
+   {
+      {
+         "williamboman/mason.nvim",
+         build = ":MasonUpdate",
+         config = function()
+            require("mason").setup()
+         end
+      },
+      {
+         "williamboman/mason-lspconfig.nvim",
+         dependencies = {
+            "williamboman/mason.nvim",
+            "neovim/nvim-lspconfig",
+         },
+         config = function()
+            require("mason-lspconfig").setup({
+               ensure_installed = {
+                  "csharp_ls"
+               }
+            })
+         end
+      },
+      {
+         "neovim/nvim-lspconfig",
+         event = { "BufReadPre", "BufNewFile"},
+         config = function()
+            local lspconfig = require("lspconfig")
+            local on_attach = function(client, bufnr)
+               local ok, err = pcall(function()
+                  vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, { buffer = bufnr, desc = "Code Actions"})
+                  vim.keymap.set("n", "K", vim.lsp.buf.signature_help, {buffer=bufnr, desc = "Signature"})
+                  vim.keymap.set("n", "<C-k>", vim.lsp.buf.hover, {buffer=bufnr, desc="Hover"})
+                  vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, {buffer=bufnr, desc="Rename"})
+                  if client.server_capabilities.documentFormattingProvider then
+                     vim.api.nvim_create_autocmd("BufWritePre", {
+                        buffer = bufnr,
+                        callback = function()
+                           vim.lsp.buf.format({async=true})
+                        end
+                     })
+                  end
+               end)
+               if not ok then
+                  vim.notify("LSP on_attach error:" .. err, vim.log.levels.ERROR)
+               end
+            end
+
+            lspconfig.csharp_ls.setup({
+               cmd = { "csharp-ls" },
+               root_dir = lspconfig.util.root_pattern("*.sln", "*.csproj", ".git"),
+               on_attach = on_attach
+            })
+         end
+      }
+   }
 }
 require("lazy").setup(plugins, {})
+
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(args)
+    local bufnr = args.buf
+    local client_id = args.data and args.data.client_id
+    if not bufnr or not client_id then return end
+
+    local client = vim.lsp.get_client_by_id(client_id)
+    if client and client.name == "csharp_ls" and vim.api.nvim_buf_is_valid(bufnr) then
+      vim.schedule(function()
+        -- Force a 'didChange' notification by writing the same line
+        local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
+        if first_line then
+          vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { first_line })
+        end
+      end)
+    end
+  end,
+})
