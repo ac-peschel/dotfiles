@@ -7,6 +7,7 @@ vim.g.mapleader = " "
 vim.keymap.set("v", "<leader>y", '"+y', {})
 vim.keymap.set("n", "<leader>p", '"+p', {})
 vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, {})
+vim.keymap.set("n", "<leader>db", "<CMD>DBUIToggle<CR>", {})
 vim.o.wrap = false
 
 -- Lazy
@@ -86,6 +87,10 @@ local plugins = {
                "c",
                "cpp",
                "bash",
+               "markdown",
+               "markdown_inline",
+               "go",
+               "sql"
             },
             highlight = {
                enable = true,
@@ -176,7 +181,7 @@ local plugins = {
          "williamboman/mason.nvim",
          build = ":MasonUpdate",
          config = function()
-            require("mason").setup()
+            require("mason").setup({})
          end
       },
       {
@@ -192,7 +197,7 @@ local plugins = {
                   "eslint",
                   "jsonls",
                   "cssls",
-                  "html"
+                  "html",
                }
             })
          end
@@ -204,10 +209,18 @@ local plugins = {
             local lspconfig = require("lspconfig")
             local on_attach = function(client, bufnr)
                local ok, err = pcall(function()
+
+                  if client.name == "eslint" then
+                        client.server_capabilities.documentFormattingProvider = true
+                  else
+                     client.server_capabilities.documentFormattingProvider = false
+                  end
+
                   vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, { buffer = bufnr, desc = "Code Actions"})
                   vim.keymap.set("n", "K", vim.lsp.buf.signature_help, {buffer=bufnr, desc = "Signature"})
                   vim.keymap.set("n", "<C-k>", vim.lsp.buf.hover, {buffer=bufnr, desc="Hover"})
                   vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, {buffer=bufnr, desc="Rename"})
+
                   if client.server_capabilities.documentFormattingProvider then
                      vim.api.nvim_create_autocmd("BufWritePre", {
                         buffer = bufnr,
@@ -226,14 +239,7 @@ local plugins = {
                on_attach = on_attach,
                flags = { debounce_text_changes = 150},
             })
-
-            lspconfig.eslint.setup({
-               on_attach = function(client, bufnr)
-                  on_attach(client, bufnr)
-                  client.server_capabilities.documentFormattingProvider = true
-               end
-            })
-
+            lspconfig.eslint.setup({ on_attach = on_attach })
             lspconfig.html.setup({ on_attach = on_attach })
             lspconfig.cssls.setup({ on_attach = on_attach })
             lspconfig.jsonls.setup({ on_attach = on_attach })
@@ -301,6 +307,18 @@ local plugins = {
             })
          end
       }
+   },
+
+   -- Dadbod
+   {
+      "tpope/vim-dadbod",
+      dependencies = {
+         "kristijanhusak/vim-dadbod-ui",
+         "kristijanhusak/vim-dadbod-completion",
+      },
+      config = function()
+         vim.g.db_ui_use_nerd_fonts = 1
+      end
    }
 }
 require("lazy").setup(plugins, {})

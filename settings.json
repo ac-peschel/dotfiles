@@ -1,0 +1,22 @@
+{
+    "explorer.confirmDelete": false,
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.colorTheme": "GitHub Dark Dimmed",
+    "editor.fontSize": 20,
+    "workbench.activityBar.location": "hidden",
+    "workbench.layoutControl.enabled": false,
+    "window.commandCenter": false,
+    "window.menuBarVisibility": "compact",
+    "workbench.editor.editorActionsLocation": "titleBar",
+    "editor.minimap.enabled": false,
+    "vim.handleKeys": {
+        "<C-d>": true,
+        "<C-s>": false,
+        "<C-z>": false,
+        "<C-j>": false
+    },
+    "extensions.ignoreRecommendations": true,
+    "editor.stickyScroll.enabled": false,
+    "git.openRepositoryInParentFolders": "never",
+    "workbench.startupEditor": "none",
+}
