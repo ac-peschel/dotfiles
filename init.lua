@@ -90,7 +90,8 @@ local plugins = {
                "markdown",
                "markdown_inline",
                "go",
-               "sql"
+               "sql",
+               "c_sharp",
             },
             highlight = {
                enable = true,
@@ -198,6 +199,7 @@ local plugins = {
                   "jsonls",
                   "cssls",
                   "html",
+                  "omnisharp",
                }
             })
          end
@@ -214,6 +216,16 @@ local plugins = {
                         client.server_capabilities.documentFormattingProvider = true
                   else
                      client.server_capabilities.documentFormattingProvider = false
+                  end
+
+                  if client.name == "omnisharp" then
+                     vim.keymap.set("n", "gd", function()
+                        if pcal(require, "telescope") then
+                           require("omnisharp_extended").telescope_lsp_definitions()
+                        else
+                           require("omnisharp_extended").lsp_definitions()
+                        end
+                     end, {buffer=bufnr, desc = "Goto Definition"})
                   end
 
                   vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, { buffer = bufnr, desc = "Code Actions"})
@@ -243,6 +255,21 @@ local plugins = {
             lspconfig.html.setup({ on_attach = on_attach })
             lspconfig.cssls.setup({ on_attach = on_attach })
             lspconfig.jsonls.setup({ on_attach = on_attach })
+
+            local mason_path = vim.fn.stdpath("data") .. "/mason/bin/OmniSharp"
+            lspconfig.omnisharp.setup({
+               cmd = { mason_path, "-lsp", "--hostPID", tostring(vim.fn.getpid()) },
+               on_attach = on_atatch,
+               handlers = {
+                  ["textDocument/definition"] = function(...)
+                     return require("omnisharp_extended").handler(...)
+                  end,
+               },
+               enable_roslyn_analyzers = true,
+               organize_imports_on_format = true,
+               enable_import_completion = true,
+               root_dir = require("lspconfig.util").root_pattern("*.sln", "*.csproj"),
+            })
          end
       }
    },
@@ -319,6 +346,85 @@ local plugins = {
       config = function()
          vim.g.db_ui_use_nerd_fonts = 1
       end
+   },
+
+   {
+     { "Hoffs/omnisharp-extended-lsp.nvim", lazy = true },
+     {
+       "nvimtools/none-ls.nvim",
+       optional = true,
+       opts = function(_, opts)
+         local nls = require("null-ls")
+         opts.sources = opts.sources or {}
+         table.insert(opts.sources, nls.builtins.formatting.csharpier)
+       end,
+     },
+     {
+       "stevearc/conform.nvim",
+       optional = true,
+       opts = {
+         formatters_by_ft = {
+           cs = { "csharpier" },
+         },
+         formatters = {
+           csharpier = {
+             command = "dotnet-csharpier",
+             args = { "--write-stdout" },
+           },
+         },
+       },
+     },
+     {
+       "mason-org/mason.nvim",
+       opts = { ensure_installed = { "csharpier", "netcoredbg" } },
+     },
+     {
+       "mfussenegger/nvim-dap",
+       optional = true,
+       opts = function()
+         local dap = require("dap")
+         if not dap.adapters["netcoredbg"] then
+           require("dap").adapters["netcoredbg"] = {
+             type = "executable",
+             command = vim.fn.exepath("netcoredbg"),
+             args = { "--interpreter=vscode" },
+             options = {
+               detached = false,
+             },
+           }
+         end
+         for _, lang in ipairs({ "cs", "fsharp", "vb" }) do
+           if not dap.configurations[lang] then
+             dap.configurations[lang] = {
+               {
+                 type = "netcoredbg",
+                 name = "Launch file",
+                 request = "launch",
+                 ---@diagnostic disable-next-line: redundant-parameter
+                 program = function()
+                   return vim.fn.input("Path to dll: ", vim.fn.getcwd() .. "/", "file")
+                 end,
+                 cwd = "${workspaceFolder}",
+               },
+             }
+           end
+         end
+       end,
+     },
+     {
+       "nvim-neotest/neotest",
+       optional = true,
+       dependencies = {
+         "Issafalcon/neotest-dotnet",
+       },
+       opts = {
+         adapters = {
+           ["neotest-dotnet"] = {
+             -- Here we can set options for neotest-dotnet
+           },
+         },
+       },
+     },
    }
 }
 require("lazy").setup(plugins, {})
