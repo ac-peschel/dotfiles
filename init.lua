@@ -259,7 +259,7 @@ local plugins = {
             local mason_path = vim.fn.stdpath("data") .. "/mason/bin/OmniSharp"
             lspconfig.omnisharp.setup({
                cmd = { mason_path, "-lsp", "--hostPID", tostring(vim.fn.getpid()) },
-               on_attach = on_atatch,
+               on_attach = on_attach,
                handlers = {
                   ["textDocument/definition"] = function(...)
                      return require("omnisharp_extended").handler(...)

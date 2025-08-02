@@ -19,4 +19,8 @@
     "editor.stickyScroll.enabled": false,
     "git.openRepositoryInParentFolders": "never",
     "workbench.startupEditor": "none",
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "chat.commandCenter.enabled": false,
+    "chat.agent.enabled": false,
+    "telemetry.feedback.enabled": false,
 }
