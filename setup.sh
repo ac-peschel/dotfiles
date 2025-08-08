@@ -8,4 +8,4 @@ link_config ~/repos/dotfiles/init.lua ~/.config/nvim/init.lua
 link_config ~/repos/dotfiles/settings.json ~/.config/Code/User/settings.json
 link_config ~/repos/dotfiles/.tmux.conf ~/.tmux.conf
 link_config ~/repos/dotfiles/config.yml ~/.config/lazygit/config.yml
-link_config ~/repos/dotfiles/kitty.conf ~/.config/kitty/kitty.conf
+link_config ~/repos/dotfiles/.wezterm.lua ~/.wezterm.lua
