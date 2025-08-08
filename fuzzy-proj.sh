@@ -37,10 +37,11 @@ if [[ -z "$SELECTED" ]]; then
 fi
 
 CONFIG_FILE="$SELECTED/$CONFIG_NAME"
+SESSION_NAME=$(basename "$SELECTED")
 
 # Kill all current tmux sessions
-if tmux ls &>/dev/null; then
-   tmux kill-server
+if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+   tmux kill-session -t "$SESSION_NAME"
 fi
 
 if ! command -v jq &>/dev/null; then
@@ -48,7 +49,6 @@ if ! command -v jq &>/dev/null; then
    exit 1
 fi
 
-SESSION_NAME=$(basename "$SELECTED")
 tmux new-session -d -s "$SESSION_NAME"
 
 NUM_TABS=$(jq '.tabs | length' "$CONFIG_FILE")
