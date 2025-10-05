@@ -7,7 +7,19 @@ vim.g.mapleader = " "
 vim.keymap.set("v", "<leader>y", '"+y', {})
 vim.keymap.set("n", "<leader>p", '"+p', {})
 vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, {})
+vim.keymap.set("n", "<leader>p", "<Cmd>NeovimProjectDiscover<CR>", {})
 vim.o.wrap = false
+vim.o.guifont = "Hurmit Nerd Font Mono:h25"
+if vim.g.neovide then
+   vim.g.neovide_cursor_animation_length = 0.03
+   vim.g.neovide_cursor_trail_size = 0.1
+end
+if vim.loop.os_uname().sysname == "Windows_NT" then
+   vim.opt.shell = "powershell.exe"
+   vim.opt.shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command"
+   vim.opt.shellquote = ""
+   vim.opt.shellxquote = ""
+end
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -42,6 +54,7 @@ local plugins = {
                "json",
                "lua",
                "go",
+               "zig",
             },
             highlight = {
                enable = true,
@@ -130,6 +143,7 @@ local plugins = {
             ensure_installed = { 
                "ts_ls",
                "gopls",
+               "zls",
             },
             handlers = {
                function(server_name)
@@ -151,6 +165,52 @@ local plugins = {
       },
       config = function()
          vim.keymap.set("n", "<leader>e", "<Cmd>Neotree float toggle<CR>", {})
+      end
+   },
+   {
+		"coffebar/neovim-project",
+		opts = {
+			projects = {
+				"d:/repos/*",
+			},
+		},
+		picker = {
+			type = "telescope",
+		},
+		dependencies = {
+			"Shatur/neovim-session-manager",
+		},
+		lazy = false,
+		prority = 100,
+   },
+   {
+      "akinsho/toggleterm.nvim",
+      version ="*",
+      config = function()
+         require("toggleterm").setup({
+            size = 15,
+            shade_terminals = true,
+            direction = "float",
+            float_opts = {
+               border = "curved",
+            },
+            start_in_insert = true,
+            insert_mappings = false,
+            terminal_mappings = true,
+         })
+         vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], {})
+         vim.keymap.set("n", "<leader>1", function() require("toggleterm").toggle(2) end)
+         vim.keymap.set("n", "<leader>2", function() require("toggleterm").toggle(3) end)
+         vim.keymap.set("n", "<leader>3", function() require("toggleterm").toggle(4) end)
+
+         local Terminal = require("toggleterm.terminal").Terminal
+         local lazygit = Terminal:new({
+            cmd = "lazygit",
+            dir = "git_dir",
+            direction = "float",
+            hidden = true,
+         })
+         vim.keymap.set("n", "<leader>g", function() lazygit:toggle() end, {})
       end
    }
 }

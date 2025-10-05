@@ -88,7 +88,7 @@ return {
    tab_bar_at_bottom = true,
    leader = { key="b", mods="CTRL", timeout_milliseconds=1000 },
    keys = {
-      {key="c", mods="LEADER", action=wezterm.action{SpawnTab="DefaultDomain"}},
+      {key="c", mods="LEADER", action=wezterm.action{SpawnTab="CurrentPaneDomain"}},
       {key="x", mods="LEADER", action=wezterm.action{CloseCurrentTab={confirm=true}}},
       {key="1", mods="LEADER", action=wezterm.action{ActivateTab=0}},
       {key="2", mods="LEADER", action=wezterm.action{ActivateTab=1}},
