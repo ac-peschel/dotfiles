@@ -1,34 +1,56 @@
 local wezterm = require 'wezterm'
-
 local colors = {
-    foreground = "#c5c9c5",
-    background = "#181616",
-    cursor_bg = "#C8C093",
-    cursor_fg = "#C8C093",
-    cursor_border = "#C8C093",
-    selection_fg = "#C8C093",
-    selection_bg = "#2D4F67",
+    foreground = "#ECE1D7",
+    background = "#292522",
+    cursor_bg = "#ECE1D7",
+    cursor_fg = "#292522",
+    cursor_border = "#ECE1D7",
+    selection_fg = "#ECE1D7",
+    selection_bg = "#403A36",
     scrollbar_thumb = "#16161D",
     split = "#16161D",
     ansi = {
-        "#0D0C0C",
-        "#C4746E",
-        "#8A9A7B",
-        "#C4B28A",
-        "#8BA4B0",
-        "#A292A3",
-        "#8EA4A2",
-        "#C8C093",
+        "#34302C",
+        "#BD8183",
+        "#78997A",
+        "#E49B5D",
+        "#7F91B2",
+        "#B380B0",
+        "#7B9695",
+        "#C1A78E",
     },
     brights = {
-        "#A6A69C",
-        "#E46876",
-        "#87A987",
-        "#E6C384",
-        "#7FB4CA",
-        "#938AA9",
-        "#7AA89F",
-        "#C5C9C5",
+        "#867462",
+        "#D47766",
+        "#85B695",
+        "#EBC06D",
+        "#A3A9CE",
+        "#CF9BC2",
+        "#89B3B6",
+        "#ECE1D7",
+    },
+}
+colors.tab_bar = {
+    background = colors.background,
+    active_tab = {
+        bg_color = "#2A2828", 
+        fg_color = colors.foreground,
+    },
+    inactive_tab = {
+        bg_color = colors.background,
+        fg_color = colors.brights[1], 
+    },
+    inactive_tab_hover = {
+        bg_color = "#3A3838",
+        fg_color = colors.foreground,
+    },
+    new_tab = {
+        bg_color = colors.background,
+        fg_color = colors.ansi[4], 
+    },
+    new_tab_hover = {
+        bg_color = "#2A2828",
+        fg_color = colors.brights[4],
     },
 }
 
@@ -51,40 +73,6 @@ return {
    use_fancy_tab_bar = false,
    hide_tab_bar_if_only_one_tab = false,
    colors = colors,
-   colors = {
-      tab_bar = {
-         background = colors.background,
-         active_tab = {
-            bg_color = "#2A2828", 
-            fg_color = colors.foreground,
-         },
-         inactive_tab = {
-            bg_color = "#181616",
-            fg_color = "#A6A69C",
-         },
-         inactive_tab_hover = {
-             bg_color = "#1F1E1E",
-             fg_color = colors.foreground,
-         },
-         new_tab = {
-             bg_color = "#181616",
-             fg_color = "#C4B28A",
-         },
-         new_tab_hover = {
-             bg_color = "#2A2828",
-             fg_color = "#E6C384",
-         },
-      },
-      foreground = colors.foreground,
-      background = colors.background,
-      cursor_bg = colors.cursor_bg,
-      cursor_fg = colors.cursor_fg,
-      cursor_border = colors.cursor_border,
-      selection_bg = colors.selection_bg,
-      selection_fg = colors.selection_fg,
-      ansi = colors.ansi,
-      brights = colors.brights,
-   },
    tab_bar_at_bottom = true,
    leader = { key="b", mods="CTRL", timeout_milliseconds=1000 },
    keys = {

@@ -9,6 +9,7 @@ vim.keymap.set("v", "<leader>y", '"+y', {})
 vim.keymap.set("n", "<leader>p", '"+p', {})
 vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, {})
 vim.keymap.set("n", "<C-p>", "<Cmd>NeovimProjectDiscover<CR>", {})
+vim.keymap.set("n", "<Esc>", "<Cmd>nohlsearch<CR>", { silent = true})
 vim.o.wrap = false
 vim.o.guifont = "Hurmit Nerd Font Mono:h25"
 if vim.g.neovide then
@@ -55,8 +56,6 @@ local plugins = {
             ensure_installed = {
                "javascript",
                "typescript",
-               "html",
-               "css",
                "json",
                "lua",
                "go",
