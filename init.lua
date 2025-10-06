@@ -1,3 +1,4 @@
+-- general settings
 vim.cmd("set expandtab")
 vim.cmd("set tabstop=3")
 vim.cmd("set softtabstop=3")
@@ -7,7 +8,7 @@ vim.g.mapleader = " "
 vim.keymap.set("v", "<leader>y", '"+y', {})
 vim.keymap.set("n", "<leader>p", '"+p', {})
 vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, {})
-vim.keymap.set("n", "<leader>p", "<Cmd>NeovimProjectDiscover<CR>", {})
+vim.keymap.set("n", "<C-p>", "<Cmd>NeovimProjectDiscover<CR>", {})
 vim.o.wrap = false
 vim.o.guifont = "Hurmit Nerd Font Mono:h25"
 if vim.g.neovide then
@@ -21,6 +22,7 @@ if vim.loop.os_uname().sysname == "Windows_NT" then
    vim.opt.shellxquote = ""
 end
 
+-- loading lazy
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
    vim.fn.system({
@@ -33,11 +35,15 @@ if not vim.loop.fs_stat(lazypath) then
    })
 end
 vim.opt.rtp:prepend(lazypath)
+
+-- plugins
 local plugins = {
    {
-      "rebelot/kanagawa.nvim",
+      "savq/melange-nvim",
+      priority = 100,
+      lazy = false,
       config = function()
-         vim.cmd("colorscheme kanagawa-dragon")
+         vim.cmd.colorscheme("melange")
       end
    },
    {
@@ -212,7 +218,13 @@ local plugins = {
          })
          vim.keymap.set("n", "<leader>g", function() lazygit:toggle() end, {})
       end
+   },
+   {
+      "nvim-lualine/lualine.nvim",
+      dependencies = { "nvim-tree/nvim-web-devicons" },
+      config = function()
+         require("lualine").setup()
+      end
    }
 }
 require("lazy").setup(plugins, {})
-
