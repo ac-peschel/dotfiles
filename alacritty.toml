@@ -1,0 +1,28 @@
+[colors]
+[colors.normal]
+black   = "0x3C3836"
+red     = "0xFB4934"
+green   = "0xA89984"
+yellow  = "0xD79921"
+blue    = "0x83A598"
+magenta = "0xD3869B"
+cyan    = "0x8EC07C"
+white   = "0xEBDBB2"
+[colors.bright]
+black   = "0x928374"
+red     = "0xFB4934"
+green   = "0xA89984"
+yellow  = "0xD79921"
+blue    = "0x83A598"
+magenta = "0xD3869B"
+cyan    = "0x8EC07C"
+white   = "0xFFFFFF"
+[colors.primary]
+background = "0x2E2A26"
+foreground = "0xE2D6B4"
+[font]
+size = 22
+
+[font.normal]
+family = "Hurmit Nerd Font Mono"
+style = "Regular"
