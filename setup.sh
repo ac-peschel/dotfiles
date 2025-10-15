@@ -11,6 +11,7 @@ mkdir -p ~/.config/rofi
 
 chmod +x ~/github/ac-peschel/dotfiles/polybar/launch.sh
 
+rm -rf ~/.config/nvim
 ln -s ~/github/ac-peschel/dotfiles/nvim ~/.config/nvim
 link_config ~/github/ac-peschel/dotfiles/i3/config ~/.config/i3/config
 link_config ~/github/ac-peschel/dotfiles/alacritty.toml ~/.config/alacritty/alacritty.toml
