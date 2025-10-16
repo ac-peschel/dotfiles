@@ -6,3 +6,5 @@ vim.cmd("set number relativenumber")
 vim.opt.termguicolors = true
 vim.g.mapleader = " "
 vim.o.wrap = false
+vim.keymap.set("n", "<C-v>", '"+p', {})
+vim.keymap.set("v", "<C-c>", '"+y', {})

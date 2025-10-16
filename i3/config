@@ -9,7 +9,6 @@ exec --no-startup-id nm-applet
 exec_always --no-startup-id picom
 exec_always killall polybar
 exec_always --no-startup-id ~/.config/polybar/launch.sh
-exec_always feh --bg-scale ~/github/ac-peschel/dotfiles/backgrounds/01.png
 
 set $refresh_i3status killall -SIGUSR1 i3status
 floating_modifier $mod
@@ -118,3 +117,4 @@ gaps outer 3
 
 # Startup
 exec --no-startup-id sh -c 'sleep 1 && xrandr --output DP-0 --right-of HDMI-0'
+exec --no-startup-id sh -c 'sleep 2 && feh --bg-scale ~/github/ac-peschel/dotfiles/backgrounds/01.png'
