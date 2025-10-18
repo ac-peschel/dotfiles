@@ -9,3 +9,4 @@ vim.o.wrap = false
 vim.keymap.set("n", "<C-v>", '"+p', {})
 vim.keymap.set("v", "<C-c>", '"+y', {})
 vim.keymap.set("n", "<Esc>", "<Cmd>nohlsearch<CR>", { silent = true })
+vim.opt.guicursor = ""
