@@ -1,11 +1,4 @@
-# Requirements:
- - i3
- - alacritty
- - nvim
- - yay
-
-# Yay installs:
- - yay picom
- - yay polybar
- - yay feh
- - yay rofi
+# Symlinks
+mkdir -p ~/.config/nvim
+ls -s ~/dev/github/ac-peschel/dotfiles/init.lua ~/.config/nvim/init.lua
+ls -s ~/dev/github/ac-peschel/dotfiles/.tmux.conf ~/.tmux.conf
