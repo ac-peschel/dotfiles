@@ -67,4 +67,28 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>fg", builtin.live_grep, {})
     end
   },
+
+  -- Oil
+  {
+    "stevearc/oil.nvim",
+    config = function()
+      require("oil").setup({
+        columns = {
+          "icon",
+          "permissions",
+          "size",
+          "mtime",
+        },
+        view_options = {
+          show_hidden = true,
+        },
+        keymaps = {
+          ["<CR>"] = "actions.select",
+          ["-"] = "actions.parent",
+          ["q"] = "actions.close",
+        },
+      })
+      vim.keymap.set("n", "<leader>e", "<Cmd>Oil<CR>", {})
+    end
+  },
 })
