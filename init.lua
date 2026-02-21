@@ -1,3 +1,4 @@
+-- Basic config
 vim.cmd("set expandtab")
 vim.cmd("set tabstop=2")
 vim.cmd("set softtabstop=2")
@@ -22,6 +23,39 @@ vim.g.clipboard = {
 vim.keymap.set("n", "<C-v>", '"+p', {})
 vim.keymap.set("v", "<C-c>", '"+y', {})
 
+-- Rust LSP
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "rust",
+  callback = function()
+    local root_dir = vim.fs.find("Cargo.toml", { upward = true })[1]
+    if not root_dir then
+      return
+    end
+    root_dir = vim.fs.dirname(root_dir)
+    local clients = vim.lsp.get_active_clients({ bufnr = 0 })
+    for _, c in ipairs(clients) do
+      if c.name == "rust_analyzer" then
+        return
+      end
+    end
+
+    local client_id = vim.lsp.start_client({
+      name = "rust_analyzer",
+      cmd = { "rust-analyzer" },
+      root_dir = vim.loop.cwd(),
+      settings = {
+        ["rust-analyzer"] = {
+          diagnostics = { enable = true, disabled = { "unresolved-proc-macro" } },
+          completion = { autoimport = false, postfix = { enable = true } },
+        }
+      },
+      flags = { debounce_text_changes = 150 },
+    })
+    vim.lsp.buf_attach_client(0, client_id)
+  end
+})
+
+-- Lazy
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
