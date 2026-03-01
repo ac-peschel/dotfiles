@@ -1,3 +1,4 @@
 # Symlinks
 mkdir -p ~/.config/nvim \
-ls -s ~/dev/github/ac-peschel/dotfiles/.tmux.conf ~/.tmux.conf \
+ln -s ~/dev/github/ac-peschel/dotfiles/.tmux.conf ~/.tmux.conf \
+ln -s ~/dev/github/ac-peschel/dotfiles/config.toml ~/.config/helix/config.toml \
