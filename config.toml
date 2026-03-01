@@ -1,1 +1,13 @@
 theme = "kanagawa-dragon"
+
+[editor]
+line-number = "relative"
+scrolloff = 999
+
+[editor.cursor-shape]
+insert = "block"
+normal = "block"
+select = "underline"
+
+[editor.softwrap]
+enable = false
