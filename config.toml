@@ -8,6 +8,3 @@ scrolloff = 999
 insert = "block"
 normal = "block"
 select = "underline"
-
-[editor.softwrap]
-enable = false
