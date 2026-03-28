@@ -17,48 +17,42 @@ vim.g.clipboard = {
 vim.keymap.set("n", "<C-v>", '"+p', {})
 vim.keymap.set("v", "<C-c>", '"+y', {})
 
--- LSP
-local function on_attach(client, bufnr)
-  local opts = { noremap = true, silent = true, buffer = true }
-  vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-  vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-  vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-  vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-  vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_actions, opts)
-  if client.server_capabilities.documentFormattingProvider then
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      buffer = bufnr,
-      callback = function()
-        vim.lsp.buf.format({ async = true })
-      end
-    })
-  end
-end
-local function attach_lsp(pattern, name, cmd, settings)
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = pattern,
-    callback = function()
-      local bufnr = args.buf
-      local clients = vim.lsp.get_active_clients({bufnr=bufnr})
-      for _, c in ipairs(clients) do
-        if c.name == name then
-          return
-        end
-      end
-      local root = vim.fs.dirname(vim.fs.find({"go.mod", ".git"}, {upward=true})[1])
-      local client_id = vim.lsp.start({
-        name = name,
-        cmd = cmd,
-        root_dir = root,
-        settings = settings,
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(ev)
+    local bufnr = ev.buf
+    local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    local opts = { noremap = true, silent = true, buffer = bufnr }
+
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+    vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+
+    if client and client.server_capabilities.documentFormattingProvider then
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        buffer = bufnr,
+        callback = function()
+          vim.lsp.buf.format({ async = false })
+        end,
       })
-      vim.lsp.buf_attach_client(bufnr, client_id)
-      local client = vim.lsp.get_client_by_id(client_id)
-      on_attach(client, bufnr)
     end
-  })
-end
-attach_lsp({"go", "gomod"}, "gopls", {"gopls"})
+  end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "go", "gomod" },
+  callback = function()
+    local root = vim.fs.find({ "go.mod", ".git" }, { upward = true })[1]
+    if not root then return end
+
+    vim.lsp.start({
+      name = "gopls",
+      cmd = { "gopls" },
+      root_dir = vim.fs.dirname(root),
+    })
+  end,
+})
 
 -- Plugins
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
