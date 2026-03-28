@@ -4,10 +4,10 @@ vim.cmd("set tabstop=2")
 vim.cmd("set softtabstop=2")
 vim.cmd("set shiftwidth=2")
 vim.cmd("set number relativenumber")
+vim.opt.guicursor = ""
 vim.o.wrap = false
 vim.g.mapleader = " "
 vim.keymap.set("n", "<Esc>", "<Cmd>nohlsearch<CR>", { silent = true })
-vim.opt.guicursor = ""
 vim.g.clipboard = {
 	name = "xclip",
 	copy = { ["+"] = "xclip -selection clipboard", ["*"] = "xclip -selection primary" },
@@ -28,6 +28,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
     vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
     vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+    vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
+    vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
 
     if client and client.server_capabilities.documentFormattingProvider then
       vim.api.nvim_create_autocmd("BufWritePre", {
