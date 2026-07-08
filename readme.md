@@ -1,3 +1,2 @@
-# Symlinks
-ln -s ~/dev/github/ac-peschel/dotfiles/.tmux.conf ~/.tmux.conf \
-ln -s ~/dev/github/ac-peschel/dotfiles/init.lua ~/.config/nvim/init.lua \
+# Zed Config:
+~\AppData\Roaming\Zed\
